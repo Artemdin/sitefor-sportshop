@@ -13,7 +13,7 @@ namespace siteforshop.Pages
             _logger = logger;
         }
 
-        public static List<Product> Products { get; set; } = new();
+        public List<Product> Products { get; set; } = new();
 
         [BindProperty] public string ProductType { get; set; } = "Food";
         [BindProperty] public string Title { get; set; } = string.Empty;

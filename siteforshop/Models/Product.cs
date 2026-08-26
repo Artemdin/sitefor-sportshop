@@ -9,7 +9,7 @@ namespace siteforshop.Models
         public virtual string Category => "Товар";
         public virtual string GetDetails() => "";
 
-        public static bool IsValidBase(string title, decimal price)
+        public bool IsValidBase(string title, decimal price)
         {
             return !string.IsNullOrWhiteSpace(title) && price > 0;
         }
@@ -44,7 +44,7 @@ namespace siteforshop.Models
 
         public override string GetDetails() => $"Розмір: {Size}, Колір: {Color}";
 
-        private static readonly HashSet<string> AllowedSizes = new(StringComparer.OrdinalIgnoreCase)
+        private  readonly HashSet<string> AllowedSizes = new(StringComparer.OrdinalIgnoreCase)
         {
             "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL",
             "42", "44", "46", "48", "50", "52", "54", "56"
