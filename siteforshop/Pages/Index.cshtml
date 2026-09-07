@@ -6,7 +6,7 @@
 
 <div class="container py-4">
 
-    <!-- 1. ВІТАЛЬНИЙ БАНЕР (HERO SECTION)          -->
+    <!-- 1. ВІТАЛЬНИЙ БАНЕР (HERO SECTION) -->
     <div class="p-5 mb-5 bg-light rounded-4 border shadow-sm text-center">
         <h1 class="display-5 fw-bold text-dark mb-3">Спортивний магазин</h1>
         <p class="col-md-8 fs-5 text-muted mx-auto mb-4">
@@ -14,180 +14,257 @@
         </p>
         <div class="d-flex justify-content-center gap-3">
             <a href="#catalog" class="btn btn-dark px-4 py-2">До каталогу</a>
-            <a href="#add-form" class="btn btn-outline-secondary px-4 py-2">Додати товар</a>
-        </div>
-    </div>
 
-    <!-- 2. ФОРМА ДОДАВАННЯ ТОВАРУ                 -->
-    <div id="add-form" class="card shadow-sm mb-5 border-0 bg-light">
-        <div class="card-body p-4">
-            <h4 class="card-title fw-bold mb-3">Додати новий товар</h4>
-
-            <form method="post" asp-page-handler="Add">
-                <div class="row g-3">
-
-                    <!-- Вибір категорії (Food або Clothing) -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Тип товару</label>
-                        <select asp-for="ProductType" class="form-select" id="productTypeSelect" onchange="toggleFields()">
-                            <option value="Food">Спортивне харчування</option>
-                            <option value="Clothing">Одяг</option>
-                        </select>
-                    </div>
-
-                    <!-- Базові поля: Назва та Ціна -->
-                    <div class="col-md-5">
-                        <label class="form-label fw-semibold">Назва товару</label>
-                        <input asp-for="Title" class="form-control" placeholder="Наприклад: Протеїн Whey або Футболка" required />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Ціна (грн)</label>
-                        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" required />
-                    </div>
-
-                    <!-- СПЕЦИФІЧНІ ПОЛЯ ДЛЯ СПОРТХАРЧУ (Food) -->
-                    <div id="foodFields" class="row g-3 mt-1">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Вага (грами)</label>
-                            <input asp-for="WeightGrams" type="number" class="form-control" placeholder="1000" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Смак</label>
-                            <input asp-for="Flavor" class="form-control" placeholder="Шоколад, Банан тощо" />
-                        </div>
-                    </div>
-
-                    <!-- СПЕЦИФІЧНІ ПОЛЯ ДЛЯ ОДЯГУ (Clothing) (спочатку сховані через d-none) -->
-                    <div id="clothingFields" class="row g-3 mt-1 d-none">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Розмір (S, M, L, XL, 44, 46...)</label>
-                            <input asp-for="Size" class="form-control" placeholder="M" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Колір</label>
-                            <input asp-for="Color" class="form-control" placeholder="Чорний, Синій тощо" />
-                        </div>
-                    </div>
-
-                    <!-- Кнопка відправки форми -->
-                    <div class="col-12 mt-4 text-end">
-                        <button type="submit" class="btn btn-success px-4">Зберегти в каталог</button>
-                    </div>
-
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 3. КАТАЛОГ ТОВАРІВ (ВІДОБРАЖЕННЯ КАРТОК)   -->
-    <div id="catalog" class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold m-0">Каталог товарів</h3>
-        <span class="badge bg-secondary fs-6">Усього: @Model.Products.Count</span>
-    </div>
-
-    @if (Model.Products.Count == 0)
-    {
-        <div class="alert alert-info text-center py-4">
-            Каталог поки що порожній. Додайте перший товар через форму вище!
-        </div>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (var item in Model.Products)
+            @if (IndexModel.IsAdmin)
             {
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body d-flex flex-column">
-
-                            <!-- Верх картки: Категорія та Статус наявності -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-dark text-uppercase">@item.Category</span>
-                                @if (item.InStock)
-                                {
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">В наявності</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Немає</span>
-                                }
-                            </div>
-
-                            <!-- Назва та ціна товару -->
-                            <h5 class="card-title fw-bold text-dark mt-2">@item.Title</h5>
-                            <h4 class="text-primary fw-bold mb-3">@item.Price.ToString("F2") грн</h4>
-
-                            <p class="card-text text-muted small flex-grow-1">
-                                <i class="bi bi-info-circle me-1"></i> @item.GetDetails()
-                            </p>
-
-                            <hr class="text-muted opacity-25 my-3" />
-
-                            <!-- Кнопки дій -->
-                            <div class="d-flex gap-2">
-                                <!-- Кнопка виклику форми редагування -->
-                                <button type="button"
-                                        class="btn btn-outline-secondary btn-sm flex-fill"
-                                        onclick="openEditModal(@item.Id, '@item.Title', @item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture))">
-                                    Редагувати
-                                </button>
-
-                                <!-- Форма видалення товару -->
-                                <form method="post" asp-page-handler="Delete" class="m-0">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Видалити цей товар?')">
-                                        Видалити
-                                    </button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                <button class="btn btn-outline-secondary px-4 py-2" type="button" data-bs-toggle="collapse" data-bs-target="#add-form-container">
+                    Додати товар
+                </button>
             }
         </div>
+    </div>
+
+    <!-- 2. ФОРМА ДОДАВАННЯ ТОВАРУ -->
+    @if (IndexModel.IsAdmin)
+    {
+        <div class="collapse mb-5" id="add-form-container">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-4">
+                    <h4 class="card-title fw-bold mb-3">Додати новий товар</h4>
+
+                    <form method="post" asp-page-handler="Add">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Тип товару</label>
+                                <select asp-for="ProductType" class="form-select" id="productTypeSelect" onchange="toggleFields()">
+                                    <option value="Food">Спортивне харчування</option>
+                                    <option value="Clothing">Одяг</option>
+                                    <option value="Product">Інше (товари)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold">Назва товару</label>
+                                <input asp-for="Title" class="form-control" placeholder="Наприклад: Протеїн Whey або Футболка" required />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Ціна (грн)</label>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" required />
+                            </div>
+
+                            <div id="foodFields" class="row g-3 mt-1">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Вага (грами)</label>
+                                    <input asp-for="WeightGrams" type="number" class="form-control" placeholder="1000" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Смак</label>
+                                    <input asp-for="Flavor" class="form-control" placeholder="Шоколад, Банан тощо" />
+                                </div>
+                            </div>
+
+                            <div id="clothingFields" class="row g-3 mt-1 d-none">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Розмір (S, M, L, XL, 44, 46...)</label>
+                                    <input asp-for="Size" class="form-control" placeholder="M" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Колір</label>
+                                    <input asp-for="Color" class="form-control" placeholder="Чорний, Синій тощо" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4 text-end">
+                                <button type="submit" class="btn btn-success px-4">Зберегти в каталог</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     }
 
-</div>
+    <!-- СІТКА З ДВОХ КОЛОНОК ДЛЯ КАТАЛОГУ ТА ФІЛЬТРІВ -->
+    <div class="row" id="catalog">
 
-<!--  МОДАЛЬНЕ ВІКНО ДЛЯ OnPostEdit           -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Редагування товару</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- ЛІВА ПАНЕЛЬ: ФІЛЬТРИ -->
+        <aside class="col-lg-3 col-md-4 mb-4">
+            <div class="card shadow-sm border-0 rounded-3 sticky-top" style="top: 20px;">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold m-0 text-dark">
+                            <i class="bi bi-funnel me-1"></i> Фільтри
+                        </h5>
+                        @if ((IndexModel.Category != null && IndexModel.Category.Any()) || !string.IsNullOrWhiteSpace(IndexModel.SearchQuery))
+                        {
+                            <a asp-page="/Index" class="text-decoration-none small text-danger fw-semibold">Скинути</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="get">
+                        <!-- Пошук за назвою -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Пошук</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text"
+                                       name="SearchQuery"
+                                       class="form-control bg-light border-start-0 ps-0"
+                                       placeholder="Назва товару..."
+                            </div>
+                        </div>
+
+                        <hr class="text-muted opacity-25 my-3" />
+
+                        <!-- Вибір категорій -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Категорії</label>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="catFood"
+                                       name="Category"
+                                       value="Food"
+                                <label class="form-check-label user-select-none" for="catFood">Спортивне харчування</label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="catClothing"
+                                       name="Category"
+                                       value="Clothing"
+                                <label class="form-check-label user-select-none" for="catClothing">Одяг</label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="catProduct"
+                                       name="Category"
+                                       value="Товар"
+                                <label class="form-check-label user-select-none" for="catProduct">Інше (товари)</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark fw-semibold py-2">Застосувати</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ПРАВА ПАНЕЛЬ: КАТАЛОГ ТОВАРІВ -->
+        <main class="col-lg-9 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold m-0">Каталог товарів</h3>
+                <span class="badge bg-secondary fs-6">Усього: @IndexModel.Products.Count</span>
             </div>
 
-            <form method="post" asp-page-handler="Edit">
-                <div class="modal-body">
-                    <!-- Приховане поле з ID товару -->
-                    <input type="hidden" asp-for="EditId" id="modalEditId" />
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Назва</label>
-                        <input asp-for="EditTitle" id="modalEditTitle" class="form-control" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Ціна (грн)</label>
-                        <input asp-for="EditPrice" id="modalEditPrice" type="number" step="0.01" class="form-control" required />
-                    </div>
+            @if (IndexModel.Products.Count == 0)
+            {
+                <div class="alert alert-info text-center py-4">
+                    Каталог поки що порожній.
                 </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var item in IndexModel.Products)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body d-flex flex-column">
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-                    <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-dark text-uppercase">@item.Category</span>
+                                        @if (item.InStock)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">В наявності</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Немає</span>
+                                        }
+                                    </div>
+
+                                    <h5 class="card-title fw-bold text-dark mt-2">@item.Title</h5>
+                                    <h4 class="text-primary fw-bold mb-3">@item.Price.ToString("F2") грн</h4>
+
+                                    <p class="card-text text-muted small flex-grow-1">
+                                        <i class="bi bi-info-circle me-1"></i> @item.GetDetails()
+                                    </p>
+
+                                    @if (IndexModel.IsAdmin)
+                                    {
+                                        <hr class="text-muted opacity-25 my-3" />
+                                        <div class="d-flex gap-2">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary btn-sm flex-fill"
+                                                    onclick="openEditModal(@item.Id, '@item.Title', @item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                                Редагувати
+                                            </button>
+
+                                            <form method="post" asp-page-handler="Delete" class="m-0">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Видалити цей товар?')">
+                                                    Видалити
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
-            </form>
-        </div>
+            }
+        </main>
     </div>
 </div>
 
-<!--  КЛІЄНТСЬКИЙ JS (ПЕРЕМИКАННЯ ПОЛІВ І МОДАЛКА) -->
+<!-- МОДАЛЬНЕ ВІКНО -->
+@if (IndexModel.IsAdmin)
+{
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Редагування товару</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form method="post" asp-page-handler="Edit">
+                    <div class="modal-body">
+                        <input type="hidden" asp-for="EditId" id="modalEditId" />
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Назва</label>
+                            <input asp-for="EditTitle" id="modalEditTitle" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Ціна (грн)</label>
+                            <input asp-for="EditPrice" id="modalEditPrice" type="number" step="0.01" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                        <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
 <script>
-    // Функція перемикання полів форми (Food / Clothing)
     function toggleFields() {
         const type = document.getElementById('productTypeSelect').value;
         const foodBox = document.getElementById('foodFields');
@@ -202,7 +279,6 @@
         }
     }
 
-    // Функція відкриття модального вікна редагування та заповнення його даними
     function openEditModal(id, title, price) {
         document.getElementById('modalEditId').value = id;
         document.getElementById('modalEditTitle').value = title;
@@ -212,3 +288,14 @@
         editModal.show();
     }
 </script>
+@functions {
+	public 
+#nullable restore
+#line (2,8)-(2,18) "C:\Users\Asus\source\repos\siteforshop\siteforshop\Pages\Index.cshtml"
+IndexModel
+
+#line default
+#line hidden
+#nullable disable
+	 IndexModel => ViewData.Model;
+}

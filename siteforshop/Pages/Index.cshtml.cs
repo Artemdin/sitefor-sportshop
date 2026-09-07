@@ -6,6 +6,9 @@ namespace siteforshop.Pages
 {
     public class IndexModel : PageModel
     {
+
+        public bool IsAdmin { get; set; } = true;
+
         private readonly ILogger<IndexModel> _logger;
 
         public IndexModel(ILogger<IndexModel> logger)
@@ -13,7 +16,17 @@ namespace siteforshop.Pages
             _logger = logger;
         }
 
-        public List<Product> Products { get; set; } = new();
+        public static List<Product> Products { get; set; } = new()
+{
+    new FoodProduct { Id = 1, Title = "Протеїн Whey Gold", Price = 1250, InStock = true, WeightGrams = 1000, Flavor = "Шоколад" },
+    new ClothingProduct { Id = 2, Title = "Спортивний костюм Nike", Price = 2400, InStock = true, Size = "M", Color = "Чорний" }
+};
+
+        [BindProperty(SupportsGet = true)]
+        public string SearchQuery { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public List<string> Category { get; set; } = new();
 
         [BindProperty] public string ProductType { get; set; } = "Food";
         [BindProperty] public string Title { get; set; } = string.Empty;
@@ -112,6 +125,7 @@ namespace siteforshop.Pages
             }
             return RedirectToPage();
         }
+    
     }
 }
 

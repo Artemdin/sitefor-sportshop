@@ -9,7 +9,7 @@ namespace siteforshop.Models
         public virtual string Category => "Товар";
         public virtual string GetDetails() => "";
 
-        public bool IsValidBase(string title, decimal price)
+        public static bool IsValidBase(string title, decimal price)
         {
             return !string.IsNullOrWhiteSpace(title) && price > 0;
         }
