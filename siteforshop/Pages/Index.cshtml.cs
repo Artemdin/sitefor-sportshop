@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using siteforshop.Models;
+using System.Net.NetworkInformation;
 
 namespace siteforshop.Pages
 {
     public class IndexModel : PageModel
     {
-
+        [BindProperty]
+        public string Status { get; set; } = "В наявності";
         public bool IsAdmin { get; set; } = true;
 
         private readonly ILogger<IndexModel> _logger;
@@ -16,10 +18,9 @@ namespace siteforshop.Pages
             _logger = logger;
         }
 
-        public static List<Product> Products { get; set; } = new()
-{
-    new FoodProduct { Id = 1, Title = "Протеїн Whey Gold", Price = 1250, InStock = true, WeightGrams = 1000, Flavor = "Шоколад" },
-    new ClothingProduct { Id = 2, Title = "Спортивний костюм Nike", Price = 2400, InStock = true, Size = "M", Color = "Чорний" }
+        public static List<Product> Products { get; set; } = new(){
+    new FoodProduct { Id = 1, Title = "Протеїн Whey Gold", Price = 1250, Status = "В наявності", WeightGrams = 1000, Flavor = "Шоколад" },
+    new ClothingProduct { Id = 2, Title = "Спортивний костюм Nike", Price = 2400, Status = "Очікується", Size = "M", Color = "Чорний" }
 };
 
         [BindProperty(SupportsGet = true)]
@@ -40,7 +41,7 @@ namespace siteforshop.Pages
         [BindProperty] public int EditId { get; set; }
         [BindProperty] public string EditTitle { get; set; } = string.Empty;
         [BindProperty] public decimal EditPrice { get; set; }
-
+        [BindProperty] public string EditStatus { get; set; } = "В наявності";
         public void OnGet() { }
 
         // Додавання товару з поліморфною валідацією
@@ -52,7 +53,7 @@ namespace siteforshop.Pages
                 {
                     Title = Title,
                     Price = Price,
-                    InStock = true,
+                    Status = Status, 
                     WeightGrams = WeightGrams,
                     Flavor = Flavor
                 },
@@ -60,7 +61,7 @@ namespace siteforshop.Pages
                 {
                     Title = Title,
                     Price = Price,
-                    InStock = true,
+                    Status = Status,
                     Size = Size,
                     Color = Color
                 },
@@ -68,8 +69,10 @@ namespace siteforshop.Pages
                 {
                     Title = Title,
                     Price = Price,
-                    InStock = true
+
+                    Status = Status
                 }
+            
             };
 
             // Викликаємо поліморфний метод IsValid() залежно від типу товару
@@ -98,16 +101,6 @@ namespace siteforshop.Pages
         // Сумісність зі старішою назвою методу
         public IActionResult OnPostClear(int id) => OnPostDelete(id);
 
-        // Перемикання наявності товару (InStock)
-        public IActionResult OnPostToggleStock(int id)
-        {
-            var item = Products.FirstOrDefault(p => p.Id == id);
-            if (item != null)
-            {
-                item.InStock = !item.InStock;
-            }
-            return RedirectToPage();
-        }
 
         // Редагування товару (Edit)
         public IActionResult OnPostEdit()
@@ -122,6 +115,7 @@ namespace siteforshop.Pages
             {
                 item.Title = EditTitle.Trim();
                 item.Price = EditPrice;
+                item.Status = EditStatus;
             }
             return RedirectToPage();
         }

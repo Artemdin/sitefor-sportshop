@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace siteforshop.Models
 {
     public class Product
@@ -5,7 +7,9 @@ namespace siteforshop.Models
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public bool InStock { get; set; }
+
+        [BindProperty]
+        public string Status { get; set; } = "В наявності";
         public virtual string Category => "Товар";
         public virtual string GetDetails() => "";
 

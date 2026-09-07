@@ -42,7 +42,14 @@
                                     <option value="Product">Інше (товари)</option>
                                 </select>
                             </div>
-
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Статус товару</label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="В наявності">В наявності</option>
+                                    <option value="Очікується">Очікується</option>
+                                    <option value="Немає">Немає</option>
+                                </select>
+                            </div>
                             <div class="col-md-5">
                                 <label class="form-label fw-semibold">Назва товару</label>
                                 <input asp-for="Title" class="form-control" placeholder="Наприклад: Протеїн Whey або Футболка" required />
@@ -185,9 +192,13 @@
 
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="badge bg-dark text-uppercase">@item.Category</span>
-                                        @if (item.InStock)
+                                        @if (item.Status == "В наявності")
                                         {
                                             <span class="badge bg-success-subtle text-success border border-success-subtle">В наявності</span>
+                                        }
+                                        else if (item.Status == "Очікується")
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Очікується</span>
                                         }
                                         else
                                         {
@@ -208,7 +219,7 @@
                                         <div class="d-flex gap-2">
                                             <button type="button"
                                                     class="btn btn-outline-secondary btn-sm flex-fill"
-                                                    onclick="openEditModal(@item.Id, '@item.Title', @item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                                    onclick="openEditModal(@item.Id, '@item.Title', @item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture), '@item.Status')">
                                                 Редагувати
                                             </button>
 
@@ -245,15 +256,27 @@
                 <form method="post" asp-page-handler="Edit">
                     <div class="modal-body">
                         <input type="hidden" asp-for="EditId" id="modalEditId" />
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Назва</label>
                             <input asp-for="EditTitle" id="modalEditTitle" class="form-control" required />
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Ціна (грн)</label>
                             <input asp-for="EditPrice" id="modalEditPrice" type="number" step="0.01" class="form-control" required />
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Статус товару</label>
+                            <select asp-for="EditStatus" id="modalEditStatus" class="form-select">
+                                <option value="В наявності">В наявності</option>
+                                <option value="Очікується">Очікується</option>
+                                <option value="Немає">Немає</option>
+                            </select>і
+                        </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
                         <button type="submit" class="btn btn-primary">Зберегти зміни</button>
@@ -279,14 +302,15 @@
         }
     }
 
-    function openEditModal(id, title, price) {
-        document.getElementById('modalEditId').value = id;
-        document.getElementById('modalEditTitle').value = title;
-        document.getElementById('modalEditPrice').value = price;
+   function openEditModal(id, title, price, status) {
+    document.getElementById('modalEditId').value = id;
+    document.getElementById('modalEditTitle').value = title;
+    document.getElementById('modalEditPrice').value = price;
+    document.getElementById('modalEditStatus').value = status; 
 
-        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-        editModal.show();
-    }
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    editModal.show();
+}
 </script>
 @functions {
 	public 
